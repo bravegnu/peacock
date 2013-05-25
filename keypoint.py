@@ -66,7 +66,7 @@ class Para(Element):
         self.pdf.set_font(self.pdf.theme["body-font"], '',
                           self.pdf.theme["para-size"])
 
-        if self.pdf.check_space_before():
+        if self.pdf.check_page_start():
             self.pdf.ln(self.pdf.theme["para-space-before"])
 
     def style_changed(self, style):
@@ -121,7 +121,7 @@ class List(Element):
                           self.__get_font_size())
 
     def start_item(self):
-        if self.pdf.check_space_before():
+        if self.pdf.check_page_start():
             self.pdf.ln(self.__get_space_before())
 
         bullet = self.__get_bullet()
@@ -166,7 +166,7 @@ class PDF(FPDF):
         
         self.text(30, 30, self.title)
 
-    def check_space_before(self):
+    def check_page_start(self):
         return not (self.get_x() == self.theme["lmargin-slide"]
                     and self.get_y() == self.theme["tmargin-slide"])
 
