@@ -7,6 +7,8 @@ import re
 import sys
 
 ribbon_theme = {
+    "lmargin-slide": 30,
+    "tmargin-slide": 45,
     "font": "PT Sans",
     "bullet-font": "DejaVuSans",
     "bullet-size": 20,
@@ -57,10 +59,11 @@ class Para(Element):
         self.pdf.set_text_color(0)
         self.pdf.set_font(self.pdf.theme["font"], '',
                           self.pdf.theme["para-size"])
-        self.pdf.ln(self.pdf.theme["para-space-before"])
+
+        if self.pdf.check_space_before():
+            self.pdf.ln(self.pdf.theme["para-space-before"])
 
     def style_changed(self, style):
-        print style
         self.pdf.set_font(self.pdf.theme["font"], style,
                           self.pdf.theme["para-size"])
 
@@ -112,7 +115,8 @@ class List(Element):
                           self.__get_font_size())
 
     def start_item(self):
-        self.pdf.ln(self.__get_space_before())
+        if self.pdf.check_space_before():
+            self.pdf.ln(self.__get_space_before())
 
         bullet = self.__get_bullet()
         # Get bullet width including margins
@@ -141,15 +145,22 @@ class List(Element):
         return self.parent
 
 class PDF(FPDF):
-    def set_theme(self, theme):
+    def __init__(self, theme):
+        FPDF.__init__(self, orientation="L")
         self.theme = theme
+        self.set_margins(self.theme["lmargin-slide"],
+                         self.theme["tmargin-slide"])
         
     def header(self):
         self.image('ribbon.png', 250, 0, 15)
         self.set_text_color(100)
         self.set_font('PT Sans', 'B', 40)
-        self.cell(0, 10, self.title)
-        self.ln(10)
+        
+        self.text(30, 30, self.title)
+
+    def check_space_before(self):
+        return not (self.get_x() == self.theme["lmargin-slide"]
+                    and self.get_y() == self.theme["tmargin-slide"])
 
     def footer(self):
         self.set_y(-15)
@@ -171,11 +182,12 @@ class MyHTMLParser(HTMLParser):
         self.content = []
 
         if tag == "ul":
-            self.element = self.list = List(self.pdf, "*", self.list)
+            self.list = List(self.pdf, "*", self.list)
         elif tag == "ol":
-            self.element = self.list = List(self.pdf, "1", self.list)
+            self.list = List(self.pdf, "1", self.list)
         elif tag == "li":
             self.list.start_item()
+            self.element = self.list
         elif tag == "p":
             self.element = Para(self.pdf)
         elif tag == "strong":
@@ -201,8 +213,9 @@ class MyHTMLParser(HTMLParser):
             self.pdf.set_title("%s (Contd)" % content)
         elif tag == "li":
             self.list.end_item()
+            self.element = None
         elif tag in ("ul", "ol"):
-            self.element = self.list = self.list.end_list()
+            self.list = self.list.end_list()
         elif tag == "p":
             self.element = None
         elif tag == "strong":
@@ -215,12 +228,10 @@ class MyHTMLParser(HTMLParser):
             data = self.whitespace_cleanup(data)
             self.element.write(data)
 
-pdf = PDF(orientation="L")
-pdf.set_theme(ribbon_theme)
+pdf = PDF(ribbon_theme)
 pdf.add_font("PT Sans", "B", "/home/vijaykumar/Dropbox/ascii-slides/PTS75F.ttf", uni=True)
 pdf.add_font("PT Sans", "", "/home/vijaykumar/Dropbox/ascii-slides/PTS55F.ttf", uni=True)
 pdf.add_font("DejaVuSans", "", "/home/vijaykumar/Dropbox/ascii-slides/DejaVuSans.ttf", uni=True)
-pdf.set_margins(30, 30)
 pdf.alias_nb_pages()
 
 fp = open(sys.argv[1])

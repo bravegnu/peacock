@@ -11,6 +11,48 @@ backup of all the data.
 
 Yet another para.
 
+== Multi Page Test
+
+  * In a DVCS (such as Git, Mercurial, Bazaar or Darcs), clients don't
+    just check out the latest snapshot of the files: they fully mirror
+    the repository.
+
+  * Thus if any server dies, and these systems were collaborating via
+    it, any of the client repositories can be copied back up to the
+    server to restore it.
+
+  * Every checkout is really a full backup of all the data.
+
+  * In a DVCS (such as Git, Mercurial, Bazaar or Darcs), clients don't
+    just check out the latest snapshot of the files: they fully mirror
+    the repository.
+
+  * Thus if any server dies, and these systems were collaborating via
+    it, any of the client repositories can be copied back up to the
+    server to restore it.
+
+  * Every checkout is really a full backup of all the data.
+
+  * In a DVCS (such as Git, Mercurial, Bazaar or Darcs), clients don't
+    just check out the latest snapshot of the files: they fully mirror
+    the repository.
+
+  * Thus if any server dies, and these systems were collaborating via
+    it, any of the client repositories can be copied back up to the
+    server to restore it.
+
+  * Every checkout is really a full backup of all the data.
+
+  * In a DVCS (such as Git, Mercurial, Bazaar or Darcs), clients don't
+    just check out the latest snapshot of the files: they fully mirror
+    the repository.
+
+  * Thus if any server dies, and these systems were collaborating via
+    it, any of the client repositories can be copied back up to the
+    server to restore it.
+
+  * Every checkout is really a full backup of all the data.
+
 == Version Control Systems
 
   * Git
