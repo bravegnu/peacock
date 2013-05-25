@@ -1,0 +1,75 @@
+= Git Presentation
+
+== Distributed VCS
+
+In a DVCS (such as Git, Mercurial, Bazaar or Darcs), clients don't
+just check out the latest snapshot of the files: they fully mirror the
+repository. Thus if any server dies, and these systems were
+collaborating via it, any of the client repositories can be copied
+back up to the server to restore it. Every checkout is really a full
+backup of all the data.
+
+Yet another para.
+
+== Version Control Systems
+
+  * Git
+  * Hg
+  * Bazaar
+  * Darcs
+
+== Full Nested
+
+  * abcdef
+  ** ghijkl
+  *** mnopqr
+  **** stuvwx
+  ***** yzabcd
+
+== Git Intro
+
+  * Git is an *open source*, distributed version control system
+    designed for speed and efficiency.
+
+  * You can get a Git project using two main approaches. The first
+    takes an existing project or directory and imports it into
+    Git. The second clones an existing Git repository from another
+    server.
+
+== Nested Lists
+
+  * Git is an *open source*, distributed version control system
+    designed for speed and efficiency.
+
+    1. Hg
+    2. Darcs
+    3. Mercurial
+    4. Bazaar
+
+  * You can get a Git project using two main approaches. The first
+    takes an existing project or directory and imports it into
+    Git. The second clones an existing Git repository from another
+    server.
+
+== Nested Multi-line
+
+  * Git is an *open source*, distributed version control system
+    designed for speed and efficiency.
+
+    - Git is an *open source*, distributed version control system
+      designed for speed and efficiency.
+
+    - You can get a Git project using two main approaches. The first
+      takes an existing project or directory and imports it into
+      Git.
+
+  * You can get a Git project using two main approaches. The first
+    takes an existing project or directory and imports it into
+    Git. The second clones an existing Git repository from another
+    server.
+
+== Git Commands
+
+If you want to get a copy of an existing Git repository . for example,
+a project you.d like to contribute to . the command you need is git
+clone.
