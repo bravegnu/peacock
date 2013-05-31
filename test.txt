@@ -60,6 +60,66 @@ Yet another para.
   * Bazaar
   * Darcs
 
+== Mainframes
+
+image::mainframe.png[width=288]
+
+  1. In a DVCS (such as Git, Mercurial, Bazaar or Darcs), clients
+     don't just check out the latest snapshot of the files: they fully
+     mirror the repository.
+
+  2. Thus if any server dies, and these systems were collaborating via
+     it, any of the client repositories can be copied back up to the
+     server to restore it.
+
+== Ramdisk
+
+image::ramdisk.png[width=144]
+
+  1. In a DVCS (such as Git, Mercurial, Bazaar or Darcs), clients
+     don't just check out the latest snapshot of the files: they fully
+     mirror the repository.
+
+  2. Thus if any server dies, and these systems were collaborating via
+     it, any of the client repositories can be copied back up to the
+     server to restore it.
+
+  3. In a DVCS (such as Git, Mercurial, Bazaar or Darcs), clients
+     don't just check out the latest snapshot of the files: they fully
+     mirror the repository.
+
+  4. Thus if any server dies, and these systems were collaborating via
+     it, any of the client repositories can be copied back up to the
+     server to restore it.
+     
+  5. Thus if any server dies, and these systems were collaborating via
+     it, any of the client repositories can be copied back up to the
+     server to restore it.
+
+  6. Thus if any server dies, and these systems were collaborating via
+     it, any of the client repositories can be copied back up to the
+     server to restore it.
+
+== Text Overflow
+
+image::mainframe.png[width=288]
+
+In a DVCS (such as Git, Mercurial, Bazaar or Darcs), clients don't
+just check out the latest snapshot of the files: they fully mirror the
+repository.
+
+Thus if any server dies, and these systems were collaborating via it,
+any of the client repositories can be copied back up to the server to
+restore it.
+
+In a DVCS (such as Git, Mercurial, Bazaar or Darcs), clients don't
+just check out the latest snapshot of the files: they fully mirror the
+repository.
+
+Thus if any server dies, and these systems were collaborating via it,
+any of the client repositories can be copied back up to the server to
+restore it.
+
 == Full Nested
 
   * abcdef

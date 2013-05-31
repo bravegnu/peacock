@@ -59,6 +59,9 @@ class Element(object):
     def write(self, text):
         self.pdf.write(self.h, text)
 
+    def end(self):
+        pass
+
 class Para(Element):
     def __init__(self, pdf):
         Element.__init__(self, pdf, pdf.theme["para-height"])
@@ -66,12 +69,35 @@ class Para(Element):
         self.pdf.set_font(self.pdf.theme["body-font"], '',
                           self.pdf.theme["para-size"])
 
-        if self.pdf.check_page_start():
+        if not self.pdf.check_page_start():
             self.pdf.ln(self.pdf.theme["para-space-before"])
 
     def style_changed(self, style):
         self.pdf.set_font(self.pdf.theme["body-font"], style,
                           self.pdf.theme["para-size"])
+
+    def end(self):
+        self.pdf.ln(0.01)
+
+class Image(Element):
+    def __init__(self, pdf, src, width, height):
+        Element.__init__(self, pdf, 0)
+        self.src = src
+        self.width = width / 72.0 * 25.4
+        self.height = height / 72.0 * 25.4
+        self.pdf.set_image(self)
+        self.draw()
+
+    def draw(self):
+        img_margin = self.pdf.theme["lmargin-slide"]
+        pad = 15
+        self.pdf.set_left_margin(img_margin + self.width + pad)
+        print "Set Left Margin:", self.pdf.l_margin
+        self.pdf.image(self.src, img_margin, self.pdf.t_margin,
+                       self.width, self.height)
+
+    def write(self, text):
+        pass
 
 class List(Element):
     def __init__(self, pdf, bullet, parent=None):
@@ -121,7 +147,7 @@ class List(Element):
                           self.__get_font_size())
 
     def start_item(self):
-        if self.pdf.check_page_start():
+        if not self.pdf.check_page_start():
             self.pdf.ln(self.__get_space_before())
 
         bullet = self.__get_bullet()
@@ -146,6 +172,7 @@ class List(Element):
 
     def end_item(self):
         self.pdf.set_left_margin(self.bullet_margin)
+        self.pdf.ln(0.01)
 
     def end_list(self):
         return self.parent
@@ -156,6 +183,8 @@ class PDF(FPDF):
         self.theme = theme
         self.set_margins(self.theme["lmargin-slide"],
                          self.theme["tmargin-slide"])
+        self.img = None
+        self.page_start_flag = True
         
     def header(self):
         self.image('ribbon.png', 250, 0, 15)
@@ -165,10 +194,19 @@ class PDF(FPDF):
                       self.theme["title-size"])
         
         self.text(30, 30, self.title)
+        self.page_start_flag = True
+
+        if self.img:
+            self.img.draw()
 
     def check_page_start(self):
-        return not (self.get_x() == self.theme["lmargin-slide"]
-                    and self.get_y() == self.theme["tmargin-slide"])
+        if not self.page_start_flag:
+            return False
+
+        ret = self.get_y() == self.t_margin
+        if ret == True:
+            self.page_start_flag = False
+            return True
 
     def footer(self):
         self.set_y(-15)
@@ -177,6 +215,9 @@ class PDF(FPDF):
 
     def set_title(self, title):
         self.title = title
+
+    def set_image(self, img):
+        self.img = img
 
 class MyHTMLParser(HTMLParser):
     def __init__(self, pdf):
@@ -200,6 +241,13 @@ class MyHTMLParser(HTMLParser):
             self.element = Para(self.pdf)
         elif tag == "strong":
             self.element.start_strong()
+        elif tag == "img":
+            attrs = dict(attrs)
+            width = int(attrs.get("width", 0))
+            height = int(attrs.get("height", 0))
+            src = attrs["src"]
+                
+            Image(self.pdf, src, width, height)
         else:
             self.hidden = True
 
@@ -217,14 +265,19 @@ class MyHTMLParser(HTMLParser):
 
         if tag == "h2":
             self.pdf.set_title(content)
+            self.pdf.set_margins(self.pdf.theme["lmargin-slide"],
+                                 self.pdf.theme["tmargin-slide"])
+            self.pdf.set_image(None)
             self.pdf.add_page()
             self.pdf.set_title("%s (Contd)" % content)
+            print "Title:", content
         elif tag == "li":
             self.list.end_item()
             self.element = None
         elif tag in ("ul", "ol"):
             self.list = self.list.end_list()
         elif tag == "p":
+            self.element.end()
             self.element = None
         elif tag == "strong":
             self.element.end_strong()
