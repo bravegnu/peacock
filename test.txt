@@ -62,7 +62,7 @@ Yet another para.
 
 == Mainframes
 
-image::mainframe.png[width=288]
+image::mainframe.png[width="288",align="left"]
 
   1. In a DVCS (such as Git, Mercurial, Bazaar or Darcs), clients
      don't just check out the latest snapshot of the files: they fully
@@ -74,7 +74,7 @@ image::mainframe.png[width=288]
 
 == Ramdisk
 
-image::ramdisk.png[width=144]
+image::ramdisk.png[width="144",align="left"]
 
   1. In a DVCS (such as Git, Mercurial, Bazaar or Darcs), clients
      don't just check out the latest snapshot of the files: they fully
@@ -102,7 +102,7 @@ image::ramdisk.png[width=144]
 
 == Text Overflow
 
-image::mainframe.png[width=288]
+image::mainframe.png[width="288",align="left"]
 
 In a DVCS (such as Git, Mercurial, Bazaar or Darcs), clients don't
 just check out the latest snapshot of the files: they fully mirror the
@@ -119,6 +119,14 @@ repository.
 Thus if any server dies, and these systems were collaborating via it,
 any of the client repositories can be copied back up to the server to
 restore it.
+
+== Center Image
+
+image::control.png[width="360"]
+
+In a DVCS (such as Git, Mercurial, Bazaar or Darcs), clients don't
+just check out the latest snapshot of the files: they fully mirror the
+repository.
 
 == Full Nested
 

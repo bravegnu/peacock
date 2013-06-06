@@ -37,7 +37,11 @@ ribbon_theme = {
     "l1-space-before": 11,
     "l2-space-before": 8,
     "ln-space-before": 8,
+    "image-space-before": 10,
 }
+
+class FormatError(Exception):
+    pass
 
 class Element(object):
     def __init__(self, pdf, h):
@@ -79,12 +83,34 @@ class Para(Element):
     def end(self):
         self.pdf.ln(0.01)
 
-class Image(Element):
+class BaseImage(Element):
     def __init__(self, pdf, src, width, height):
         Element.__init__(self, pdf, 0)
         self.src = src
         self.width = width / 72.0 * 25.4
         self.height = height / 72.0 * 25.4
+
+class CenterImage(BaseImage):
+    def __init__(self, pdf, src, width, height):
+        BaseImage.__init__(self, pdf, src, width, height)
+
+        hspace = self.pdf.w - self.pdf.r_margin - self.pdf.l_margin
+        hpad = (hspace - self.width) / 2
+        left = self.pdf.l_margin + hpad
+
+        self.pdf.ln(self.pdf.theme["image-space-before"])
+        self.pdf.image(self.src, left, self.pdf.y, self.width, self.height)
+
+        info = self.pdf.images[self.src]
+
+        if self.height == 0:
+            self.height = self.width * info["h"] / info["w"]
+        
+        self.pdf.set_y(self.pdf.y + self.height)
+
+class FloatImage(BaseImage):
+    def __init__(self, pdf, src, width, height):
+        BaseImage.__init__(self, pdf, src, width, height)
         self.pdf.set_image(self)
         self.draw()
 
@@ -245,9 +271,12 @@ class MyHTMLParser(HTMLParser):
             attrs = dict(attrs)
             width = int(attrs.get("width", 0))
             height = int(attrs.get("height", 0))
+            align = attrs.get("align", None)
             src = attrs["src"]
-                
-            Image(self.pdf, src, width, height)
+            if align:
+                FloatImage(self.pdf, src, width, height)
+            else:
+                CenterImage(self.pdf, src, width, height)
         else:
             self.hidden = True
 
