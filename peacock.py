@@ -522,13 +522,25 @@ class GenSlideDeck(object):
             data = self.whitespace_cleanup(data)
             self.element.write(data)
 
-pdf = PDF(ribbon_theme)
-pdf.add_font("PT Sans", "B", "/home/vijaykumar/Dropbox/ascii-slides/PTS75F.ttf", uni=True)
-pdf.add_font("PT Sans", "", "/home/vijaykumar/Dropbox/ascii-slides/PTS55F.ttf", uni=True)
-pdf.add_font("DejaVuSans", "", "/home/vijaykumar/Dropbox/ascii-slides/DejaVuSans.ttf", uni=True)
-pdf.alias_nb_pages()
+def usage(msg=None):
+    sys.stderr.write(msg)
+    print "Usage: peacock <input-file> <output-file>"
+    if msg != None: exit(1)
 
-fp = open(sys.argv[1])
-slides = yaml.load(fp, Loader=OrderedDictYAMLLoader)
-GenSlideDeck(slides, pdf)
-pdf.output(sys.argv[2],'F')
+def peacock(in_fname, out_fname):
+    pdf = PDF(ribbon_theme)
+    pdf.add_font("PT Sans", "B", "/home/vijaykumar/Dropbox/ascii-slides/PTS75F.ttf", uni=True)
+    pdf.add_font("PT Sans", "", "/home/vijaykumar/Dropbox/ascii-slides/PTS55F.ttf", uni=True)
+    pdf.add_font("DejaVuSans", "", "/home/vijaykumar/Dropbox/ascii-slides/DejaVuSans.ttf", uni=True)
+    pdf.alias_nb_pages()
+
+    fp = open(in_fname)
+    slides = yaml.load(fp, Loader=OrderedDictYAMLLoader)
+    GenSlideDeck(slides, pdf)
+    pdf.output(out_fname, 'F')
+
+if __name__ == "__main__":
+    if len(sys.argv) != 3:
+        usage("error: insufficient arguments")
+        
+    peacock(sys.argv[1], sys.argv[2])
