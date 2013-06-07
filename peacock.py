@@ -297,6 +297,74 @@ class PDF(FPDF):
     def set_image(self, img):
         self.img = img
 
+class Layout(object):
+    def start(self, pos):
+        raise NotImplementedError("start() not implemented")
+
+    def end(self):
+        raise NotImplementedError("end() not implemented")
+
+class SimpleLayout(object):
+    def __init__(self, pdf):
+        self.pdf = pdf
+    
+    def start(self, pos):
+        pass
+    
+    def end(self):
+        pass
+
+class TwoColumnLayout(object):
+    def __init__(self, pdf):
+        self.pdf = pdf
+        self.column_gap = self.pdf.theme["lmargin-slide"]
+        available = self.pdf.w - (self.pdf.theme["lmargin-slide"] * 2)
+        available -=  self.column_gap
+        self.column_width = available / 2
+        self.done = None
+
+    def __get_col_margin(self):
+        return (self.pdf.theme["lmargin-slide"]
+                + self.column_width
+                + self.column_gap)
+
+    def __start_left(self):
+        rmargin = self.__get_col_margin()
+        self.pdf.set_margins(self.pdf.theme["lmargin-slide"],
+                             self.pdf.theme["tmargin-slide"],
+                             rmargin)
+        self.done = "left"
+        self.pdf.set_xy(self.pdf.l_margin, self.pdf.t_margin)
+
+    def __start_right(self):
+        lmargin = self.__get_col_margin()
+        self.pdf.set_margins(lmargin,
+                             self.pdf.theme["tmargin-slide"],
+                             self.pdf.theme["lmargin-slide"])
+        self.done = "right"
+        self.pdf.set_xy(self.pdf.l_margin, self.pdf.t_margin)
+
+    def __start_auto(self):
+        if self.done == "left":
+            self.__start_right()
+        elif self.done == "right":
+            self.__start_left()
+        else: # is None
+            self.__start_left()
+        
+    def start(self, pos):
+        if pos == "left":
+            self.__start_left()
+        elif pos == "right":
+            self.__start_right()
+        elif pos == None:
+            self.__start_auto()
+        else:
+            ValueError("invalid position '%s'" % pos)
+
+    def end(self):
+        pass
+
 class GenSlideDeck(object):
     def __init__(self, slides, pdf):
         self.pdf = pdf
@@ -315,7 +383,7 @@ class GenSlideDeck(object):
         self.pdf.add_page()
         self.pdf.set_title("%s (Contd)" % title)
         self.list = None
-        self.layout = None
+        self.layout = SimpleLayout(self.pdf)
 
     def __gen_item(self, item, next_item):
         if isinstance(item, list):
@@ -328,12 +396,14 @@ class GenSlideDeck(object):
             self.list.end_item()
 
     def __gen_list(self, items):
+        self.layout.start(None)
         self.list = List(self.pdf, "*", self.list)
 
         for item, next_item in pairwise(items):
             self.__gen_item(item, next_item)
 
         self.list = self.list.end_list()
+        self.layout.end()
 
     def __gen_image(self, image):
         try:
@@ -342,28 +412,46 @@ class GenSlideDeck(object):
             raise FormatError("Missing src for image")
         width = image.get("width", 0)
         height = image.get("height", 0)
+        pos = image.get("pos", None)
+        
+        self.layout.start(pos)
         CenterImage(self.pdf, src, width, height)
+        self.layout.end()
 
     def __gen_layout(self, layout):
-        pass
+        layout_mode = layout.get("mode", None)
+        if layout_mode == None:
+            raise FormatError("Missing layout mode")
+        
+        if layout_mode == "two-col":
+            self.layout = TwoColumnLayout(self.pdf)
+        elif layout_mode == "simple":
+            self.layout = SimpleLayout(self.pdf)
+        else:
+            raise FormatError("Invalid layout mode '%s'", layout["mode"])
 
     def __gen_table(self, table):
         pass
 
     def __gen_one_slide(self, title, body):
         self.__new_slide(title)
-        if isinstance(body[0], dict):
-            dtype = body[0].get("type", None)
-            if dtype == "image":
-                self.__gen_image(dtype)
-            elif dtype == "layout":
-                self.__gen_layout(dtype)
-            elif dtype == "table":
-                self.__gen_table(dtype)
+        
+        for i, item in enumerate(body):
+            if isinstance(item, dict):
+                dtype = item.get("type", None)
+                if dtype == "image":
+                    self.__gen_image(item)
+                elif dtype == "layout":
+                    self.__gen_layout(item)
+                elif dtype == "table":
+                    self.__gen_table(item)
+                elif dtype == None:
+                    raise FormatError("Missing data type")
+                else:
+                    raise FormatError("Unknown data type: %s", dtype)
             else:
-                raise FormatError("Unknown data type: %s", dtype)
-        else:
-            self.__gen_list(body)
+                self.__gen_list(body[i:])
+                break
 
     def __gen_slides(self):
         for title, body in self.slides.iteritems():
