@@ -1,0 +1,121 @@
+Distributed VCS:
+
+  - In a DVCS (such as Git, Mercurial, Bazaar or Darcs), clients don't
+    just check out the latest snapshot of the files they fully mirror
+    the repository. Thus if any server dies, and thxese systems were
+    collaborating via it, any of the client repositories can be copied
+    back up to the server to restore it. Every checkout is really a
+    full backup of all the data.
+
+  - Yet another para.
+
+Multi Page Test:
+
+  - In a DVCS (such as Git, Mercurial, Bazaar or Darcs), clients don't
+    just check out the latest snapshot of the files they fully mirror
+    the repository.
+
+  - Thus if any server dies, and these systems were collaborating via
+    it, any of the client repositories can be copied back up to the
+    server to restore it.
+
+  - Every checkout is really a full backup of all the data.
+
+  - In a DVCS (such as Git, Mercurial, Bazaar or Darcs), clients don't
+    just check out the latest snapshot of the files they fully mirror
+    the repository.
+
+  - Thus if any server dies, and these systems were collaborating via
+    it, any of the client repositories can be copied back up to the
+    server to restore it.
+
+  - Every checkout is really a full backup of all the data.
+
+  - In a DVCS (such as Git, Mercurial, Bazaar or Darcs), clients don't
+    just check out the latest snapshot of the files they fully mirror
+    the repository.
+
+  - Thus if any server dies, and these systems were collaborating via
+    it, any of the client repositories can be copied back up to the
+    server to restore it.
+
+  - Every checkout is really a full backup of all the data.
+
+  - In a DVCS (such as Git, Mercurial, Bazaar or Darcs), clients don't
+    just check out the latest snapshot of the files they fully mirror
+    the repository.
+
+  - Thus if any server dies, and these systems were collaborating via
+    it, any of the client repositories can be copied back up to the
+    server to restore it.
+
+  - Every checkout is really a full backup of all the data.
+
+Version Control Systems:
+
+  - Git
+  - Hg
+  - Bazaar
+  - Darcs
+
+Nested Lists:
+
+  - Git is an *open source*, distributed version control system
+    designed for speed and efficiency
+
+  - - Hg
+    - Darcs
+    - Mercurial
+    - Bazaar
+
+  - You can get a Git project using two main approaches. The first
+    takes an existing project or directory and imports it into
+    Git. The second clones an existing Git repository from another
+    server.
+
+Center Image:
+
+  - { type: image, src: control.png, width: 360 }
+
+Mainframes:
+
+  - { type: layout, mode: two-col, width: auto }
+
+  - { type: image, src: mainframe.png, width: 288, pos: left }
+  
+  - In a DVCS (such as Git, Mercurial, Bazaar or Darcs), clients don't just
+    check out the latest snapshot of the files they fully mirror the repository.
+
+  - Thus if any server dies, and these systems were collaborating via it, any
+    of the client repositories can be copied back up to the server to restore
+    it.
+
+Ramdisk:
+
+  - { type: layout, mode: two-col }
+
+  - { type: image, src: ramdisk.png, width: 144, pos: left }
+
+  - In a DVCS (such as Git, Mercurial, Bazaar or Darcs), clients don't
+    just check out the latest snapshot of the files they fully mirror
+    the repository.
+
+  - Thus if any server dies, and these systems were collaborating via
+    it, any of the client repositories can be copied back up to the
+    server to restore it.
+
+  - In a DVCS (such as Git, Mercurial, Bazaar or Darcs), clients don't
+    just check out the latest snapshot of the files they fully mirror
+    the repository.
+
+  - Thus if any server dies, and these systems were collaborating via
+    it, any of the client repositories can be copied back up to the
+    server to restore it.
+     
+  - Thus if any server dies, and these systems were collaborating via
+    it, any of the client repositories can be copied back up to the
+    server to restore it.
+
+  - Thus if any server dies, and these systems were collaborating via
+    it, any of the client repositories can be copied back up to the
+    server to restore it.
