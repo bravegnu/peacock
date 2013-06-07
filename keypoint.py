@@ -5,6 +5,59 @@ from HTMLParser import HTMLParser
 from tidylib import tidy_document
 import re
 import sys
+import yaml
+import yaml.constructor
+import itertools
+
+try:
+    # included in standard lib from Python 2.7
+    from collections import OrderedDict
+except ImportError:
+    # try importing the backported drop-in replacement
+    # it's available on PyPI
+    from ordereddict import OrderedDict
+
+def pairwise(iterable):
+    "s -> (s0,s1), (s1,s2), (s2, s3), ..."
+    a, b = itertools.tee(iterable)
+    next(b, None)
+    return itertools.izip_longest(a, b)
+
+class OrderedDictYAMLLoader(yaml.Loader):
+    """
+    A YAML loader that loads mappings into ordered dictionaries.
+    """
+
+    def __init__(self, *args, **kwargs):
+        yaml.Loader.__init__(self, *args, **kwargs)
+
+        self.add_constructor(u'tag:yaml.org,2002:map', type(self).construct_yaml_map)
+        self.add_constructor(u'tag:yaml.org,2002:omap', type(self).construct_yaml_map)
+
+    def construct_yaml_map(self, node):
+        data = OrderedDict()
+        yield data
+        value = self.construct_mapping(node)
+        data.update(value)
+
+    def construct_mapping(self, node, deep=False):
+        if isinstance(node, yaml.MappingNode):
+            self.flatten_mapping(node)
+        else:
+            raise yaml.constructor.ConstructorError(None, None,
+                'expected a mapping node, but found %s' % node.id, node.start_mark)
+
+        mapping = OrderedDict()
+        for key_node, value_node in node.value:
+            key = self.construct_object(key_node, deep=deep)
+            try:
+                hash(key)
+            except TypeError, exc:
+                raise yaml.constructor.ConstructorError('while constructing a mapping',
+                    node.start_mark, 'found unacceptable key (%s)' % exc, key_node.start_mark)
+            value = self.construct_object(value_node, deep=deep)
+            mapping[key] = value
+        return mapping
 
 ribbon_theme = {
     "lmargin-slide": 30,
@@ -192,7 +245,6 @@ class List(Element):
         # Save left margin
         self.bullet_margin = self.pdf.l_margin
         self.pdf.set_left_margin(self.bullet_margin + blt_width)
-        # print self.l_margin
 
         self.nitem += 1
 
@@ -245,13 +297,77 @@ class PDF(FPDF):
     def set_image(self, img):
         self.img = img
 
-class MyHTMLParser(HTMLParser):
-    def __init__(self, pdf):
-        HTMLParser.__init__(self)
+class GenSlideDeck(object):
+    def __init__(self, slides, pdf):
         self.pdf = pdf
+        self.slides = slides
         self.content = []
         self.element = None
         self.list = None
+        self.layout = None
+        self.__gen_slides()
+
+    def __new_slide(self, title):
+        self.pdf.set_title(title)
+        self.pdf.set_margins(self.pdf.theme["lmargin-slide"],
+                             self.pdf.theme["tmargin-slide"])
+        self.pdf.set_image(None)
+        self.pdf.add_page()
+        self.pdf.set_title("%s (Contd)" % title)
+        self.list = None
+        self.layout = None
+
+    def __gen_item(self, item, next_item):
+        if isinstance(item, list):
+            self.__gen_list(item)
+        else:
+            self.list.start_item()
+            self.list.write(item)
+
+        if not isinstance(next_item, list):
+            self.list.end_item()
+
+    def __gen_list(self, items):
+        self.list = List(self.pdf, "*", self.list)
+
+        for item, next_item in pairwise(items):
+            self.__gen_item(item, next_item)
+
+        self.list = self.list.end_list()
+
+    def __gen_image(self, image):
+        try:
+            src = image["src"]
+        except KeyError:
+            raise FormatError("Missing src for image")
+        width = image.get("width", 0)
+        height = image.get("height", 0)
+        CenterImage(self.pdf, src, width, height)
+
+    def __gen_layout(self, layout):
+        pass
+
+    def __gen_table(self, table):
+        pass
+
+    def __gen_one_slide(self, title, body):
+        self.__new_slide(title)
+        if isinstance(body[0], dict):
+            dtype = body[0].get("type", None)
+            if dtype == "image":
+                self.__gen_image(dtype)
+            elif dtype == "layout":
+                self.__gen_layout(dtype)
+            elif dtype == "table":
+                self.__gen_table(dtype)
+            else:
+                raise FormatError("Unknown data type: %s", dtype)
+        else:
+            self.__gen_list(body)
+
+    def __gen_slides(self):
+        for title, body in self.slides.iteritems():
+            self.__gen_one_slide(title, body)
 
     def handle_starttag(self, tag, attrs):
         self.content = []
@@ -325,10 +441,6 @@ pdf.add_font("DejaVuSans", "", "/home/vijaykumar/Dropbox/ascii-slides/DejaVuSans
 pdf.alias_nb_pages()
 
 fp = open(sys.argv[1])
-html = fp.read()
-fp.close()
-
-parser = MyHTMLParser(pdf)
-parser.feed(html)
-
+slides = yaml.load(fp, Loader=OrderedDictYAMLLoader)
+GenSlideDeck(slides, pdf)
 pdf.output(sys.argv[2],'F')
