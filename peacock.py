@@ -3,6 +3,8 @@
 from fpdf import FPDF
 from HTMLParser import HTMLParser
 from tidylib import tidy_document
+
+import fpdf
 import re
 import sys
 import yaml
@@ -265,7 +267,7 @@ class PDF(FPDF):
         self.page_start_flag = True
         
     def header(self):
-        self.image('ribbon.png', 250, 0, 15)
+        self.image('ribbon-theme/ribbon.png', 250, 0, 15)
         self.set_text_color(*self.theme["title-color"])
         self.set_font(self.theme["title-font"],
                       self.theme["title-style"],
@@ -524,14 +526,15 @@ class GenSlideDeck(object):
 
 def usage(msg=None):
     sys.stderr.write(msg)
-    print "Usage: peacock <input-file> <output-file>"
+    print "Usage: peacock <input-file> <theme-dir> <output-file>"
     if msg != None: exit(1)
 
-def peacock(in_fname, out_fname):
+def peacock(in_fname, theme_dir, out_fname):
+    fpdf.set_global("FPDF_FONT_DIR", theme_dir)
     pdf = PDF(ribbon_theme)
-    pdf.add_font("PT Sans", "B", "/home/vijaykumar/Dropbox/ascii-slides/PTS75F.ttf", uni=True)
-    pdf.add_font("PT Sans", "", "/home/vijaykumar/Dropbox/ascii-slides/PTS55F.ttf", uni=True)
-    pdf.add_font("DejaVuSans", "", "/home/vijaykumar/Dropbox/ascii-slides/DejaVuSans.ttf", uni=True)
+    pdf.add_font("PT Sans", "B", "PTS75F.ttf", uni=True)
+    pdf.add_font("PT Sans", "", "PTS55F.ttf", uni=True)
+    pdf.add_font("DejaVuSans", "", "DejaVuSans.ttf", uni=True)
     pdf.alias_nb_pages()
 
     fp = open(in_fname)
@@ -540,7 +543,7 @@ def peacock(in_fname, out_fname):
     pdf.output(out_fname, 'F')
 
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
+    if len(sys.argv) != 4:
         usage("error: insufficient arguments")
-        
-    peacock(sys.argv[1], sys.argv[2])
+
+    peacock(sys.argv[1], sys.argv[2], sys.argv[3])
