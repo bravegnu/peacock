@@ -10,6 +10,7 @@ import sys
 import yaml
 import yaml.constructor
 import itertools
+import os.path
 
 try:
     # included in standard lib from Python 2.7
@@ -60,40 +61,6 @@ class OrderedDictYAMLLoader(yaml.Loader):
             value = self.construct_object(value_node, deep=deep)
             mapping[key] = value
         return mapping
-
-ribbon_theme = {
-    "lmargin-slide": 30,
-    "tmargin-slide": 45,
-    "body-font": "PT Sans",
-    "body-color": (0, 0, 0),
-    "title-font": "PT Sans",
-    "title-color": (100, 100, 100),
-    "title-style": "B",
-    "title-size": 40,
-    "bullet-font": "DejaVuSans",
-    "bullet-color": (180, 180, 180),
-    "bullet-size": 20,
-    "para-size": 20,
-    "l0-size": 20,
-    "l1-size": 18,
-    "l2-size": 16,
-    "ln-size": 16,
-    "l0-bullet": unichr(0x2022),
-    "l1-bullet": unichr(0x2043),
-    "l2-bullet": unichr(0x2022),
-    "ln-bullet": unichr(0x2043),
-    "para-height": 10,
-    "l0-height": 10,
-    "l1-height": 9,
-    "l2-height": 8,
-    "ln-height": 8,
-    "para-space-before": 15,
-    "l0-space-before": 15,
-    "l1-space-before": 11,
-    "l2-space-before": 8,
-    "ln-space-before": 8,
-    "image-space-before": 10,
-}
 
 class FormatError(Exception):
     pass
@@ -258,16 +225,22 @@ class List(Element):
         return self.parent
 
 class PDF(FPDF):
-    def __init__(self, theme):
+    def __init__(self, theme, theme_dir):
         FPDF.__init__(self, orientation="L")
         self.theme = theme
+        self.theme_dir = theme_dir
         self.set_margins(self.theme["lmargin-slide"],
                          self.theme["tmargin-slide"])
         self.img = None
         self.page_start_flag = True
+
+    def theme_file(self, filename):
+        return os.path.join(self.theme_dir, filename)
         
     def header(self):
-        self.image('ribbon-theme/ribbon.png', 250, 0, 15)
+        draw_slide_background = self.theme.get("slide-background", "")
+        exec(draw_slide_background, { "pdf": self })
+        
         self.set_text_color(*self.theme["title-color"])
         self.set_font(self.theme["title-font"],
                       self.theme["title-style"],
@@ -531,12 +504,18 @@ def usage(msg=None):
 
 def peacock(in_fname, theme_dir, out_fname):
     fpdf.set_global("FPDF_FONT_DIR", theme_dir)
-    pdf = PDF(ribbon_theme)
-    pdf.add_font("PT Sans", "B", "PTS75F.ttf", uni=True)
-    pdf.add_font("PT Sans", "", "PTS55F.ttf", uni=True)
-    pdf.add_font("DejaVuSans", "", "DejaVuSans.ttf", uni=True)
+    fp = open(os.path.join(theme_dir, "info.yaml"))
+    theme = yaml.load(fp)
+
+    pdf = PDF(theme, theme_dir)
     pdf.alias_nb_pages()
 
+    for font in theme.get("fonts", []):
+        name = font[0]
+        style = font[1]
+        font_file = os.path.join(theme_dir, font[2])
+        pdf.add_font(name, style, font_file, uni=True)
+    
     fp = open(in_fname)
     slides = yaml.load(fp, Loader=OrderedDictYAMLLoader)
     GenSlideDeck(slides, pdf)
