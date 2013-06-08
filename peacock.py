@@ -341,9 +341,10 @@ class TwoColumnLayout(object):
         pass
 
 class GenSlideDeck(object):
-    def __init__(self, slides, pdf):
+    def __init__(self, slides, pdf, rpath):
         self.pdf = pdf
         self.slides = slides
+        self.rpath = rpath
         self.content = []
         self.element = None
         self.list = None
@@ -385,6 +386,10 @@ class GenSlideDeck(object):
             src = image["src"]
         except KeyError:
             raise FormatError("Missing src for image")
+        
+        if not os.path.isabs(src):
+            src = os.path.join(self.rpath, src)
+            
         width = image.get("width", 0)
         height = image.get("height", 0)
         pos = image.get("pos", None)
@@ -518,7 +523,7 @@ def peacock(in_fname, theme_dir, out_fname):
     
     fp = open(in_fname)
     slides = yaml.load(fp, Loader=OrderedDictYAMLLoader)
-    GenSlideDeck(slides, pdf)
+    GenSlideDeck(slides, pdf, os.path.dirname(in_fname))
     pdf.output(out_fname, 'F')
 
 if __name__ == "__main__":
