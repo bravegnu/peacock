@@ -1,3 +1,9 @@
+title: Introduction to Git 
+author: Vijay Kumar B.
+email: vijaykumar@bravegnu.org
+date: 2013-06-05
+keywords: [ git, vcs, version control, dvcs ]
+---
 Distributed VCS:
 
   - In a DVCS (such as Git, Mercurial, Bazaar or Darcs), clients don't

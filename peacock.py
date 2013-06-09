@@ -244,7 +244,7 @@ class PDF(FPDF):
                       self.theme["title-style"],
                       self.theme["title-size"])
         
-        self.text(30, 30, self.title)
+        self.text(30, 30, self.slide_title)
         self.page_start_flag = True
 
         if self.img:
@@ -264,8 +264,8 @@ class PDF(FPDF):
         self.set_font('Arial', 'I', 8)
         self.cell(0, 10, 'Page '+ str(self.page_no())+'/{nb}', 0, 0, 'C')
 
-    def set_title(self, title):
-        self.title = title
+    def set_slide_title(self, title):
+        self.slide_title = title
 
     def set_image(self, img):
         self.img = img
@@ -350,12 +350,12 @@ class GenSlideDeck(object):
         self.__gen_slides()
 
     def __new_slide(self, title):
-        self.pdf.set_title(title)
+        self.pdf.set_slide_title(title)
         self.pdf.set_margins(self.pdf.theme["lmargin-slide"],
                              self.pdf.theme["tmargin-slide"])
         self.pdf.set_image(None)
         self.pdf.add_page()
-        self.pdf.set_title("%s (Contd)" % title)
+        self.pdf.set_slide_title("%s (Contd)" % title)
         self.list = None
         self.layout = SimpleLayout(self.pdf)
 
@@ -455,8 +455,17 @@ def peacock(in_fname, theme_dir, out_fname):
         pdf.add_font(name, style, font_file, uni=True)
     
     fp = open(in_fname)
-    slides = yaml.load(fp, Loader=OrderedDictYAMLLoader)
-    GenSlideDeck(slides, pdf, os.path.dirname(in_fname))
+    pt = yaml.load_all(fp, Loader=OrderedDictYAMLLoader)
+    meta = pt.next()
+    slideset = pt.next()
+
+    pdf.set_title(meta["title"])
+    pdf.set_author(meta["author"])
+    keywords = ", ".join(meta.get("keywords", []))
+    pdf.set_keywords(keywords)
+    pdf.set_creator("peacock")
+        
+    GenSlideDeck(slideset, pdf, os.path.dirname(in_fname))
     pdf.output(out_fname, 'F')
 
 if __name__ == "__main__":
