@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 
 from fpdf import FPDF
-from HTMLParser import HTMLParser
-from tidylib import tidy_document
 
 import fpdf
 import re
@@ -436,71 +434,6 @@ class GenSlideDeck(object):
     def __gen_slides(self):
         for title, body in self.slides.iteritems():
             self.__gen_one_slide(title, body)
-
-    def handle_starttag(self, tag, attrs):
-        self.content = []
-
-        if tag == "ul":
-            self.list = List(self.pdf, "*", self.list)
-        elif tag == "ol":
-            self.list = List(self.pdf, "1", self.list)
-        elif tag == "li":
-            self.list.start_item()
-            self.element = self.list
-        elif tag == "p":
-            self.element = Para(self.pdf)
-        elif tag == "strong":
-            self.element.start_strong()
-        elif tag == "img":
-            attrs = dict(attrs)
-            width = int(attrs.get("width", 0))
-            height = int(attrs.get("height", 0))
-            align = attrs.get("align", None)
-            src = attrs["src"]
-            if align:
-                FloatImage(self.pdf, src, width, height)
-            else:
-                CenterImage(self.pdf, src, width, height)
-        else:
-            self.hidden = True
-
-    def whitespace_cleanup(self, content):
-        # print "!" + content + "!"
-        content = content.split("\n")
-        content = " ".join(content)
-        content = re.sub(r'(\s)+', r'\1', content) 
-        # print "@" + content + "@"
-        return content
-            
-    def handle_endtag(self, tag):
-        content = "".join(self.content)
-        content = self.whitespace_cleanup(content)
-
-        if tag == "h2":
-            self.pdf.set_title(content)
-            self.pdf.set_margins(self.pdf.theme["lmargin-slide"],
-                                 self.pdf.theme["tmargin-slide"])
-            self.pdf.set_image(None)
-            self.pdf.add_page()
-            self.pdf.set_title("%s (Contd)" % content)
-            print "Title:", content
-        elif tag == "li":
-            self.list.end_item()
-            self.element = None
-        elif tag in ("ul", "ol"):
-            self.list = self.list.end_list()
-        elif tag == "p":
-            self.element.end()
-            self.element = None
-        elif tag == "strong":
-            self.element.end_strong()
-
-    def handle_data(self, data):
-        if self.element == None:
-            self.content.append(data)
-        else:
-            data = self.whitespace_cleanup(data)
-            self.element.write(data)
 
 def usage(msg=None):
     sys.stderr.write(msg)
