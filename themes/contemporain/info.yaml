@@ -1,0 +1,53 @@
+fonts: 
+  - [ DejaVuSans, "", DejaVuSansCondensed.ttf ]
+  - [ DejaVuSerif, "", DejaVuSerifCondensed.ttf ]
+  - [ DejaVuSerif, "B", DejaVuSerifCondensed-Bold.ttf ]
+title-box:
+  - [23, 80, 250, 20]
+  - C
+  - [ DejaVuSerif, B, 40 ]
+  - [255, 255, 255]
+author-box:
+  - [23, 100, 250, 15]
+  - C
+  - [ DejaVuSerif, B, 25 ]
+  - [200, 200, 200]
+email-box:
+  - [23, 115, 250, 15]
+  - C
+  - [ DejaVuSerif, B, 25 ]
+  - [200, 200, 200]
+lmargin-slide: 30
+tmargin-slide: 45
+slide-title-font: [ DejaVuSerif, B, 40 ]
+slide-title-color: [200, 200, 200]
+bullet-font: [ DejaVuSans, "", 25 ]
+bullet-color: [0, 252, 2]
+l0-font: [ DejaVuSans, "", 22 ]
+l1-font: [ DejaVuSans, "", 20 ]
+l2-font: [ DejaVuSans, "", 18 ]
+ln-size: [ DejaVuSans, "", 18 ]
+l0-color: [255, 255, 255]
+l1-color: [255, 255, 255]
+l2-color: [255, 255, 255]
+ln-color: [255, 255, 255]
+l0-bullet: "\u2022"
+l1-bullet: "\u2043"
+l2-bullet: "\u2022"
+ln-bullet: "\u2043"
+l0-height: 10
+l1-height: 9
+l2-height: 8
+ln-height: 8
+l0-space-before: 15
+l1-space-before: 11
+l2-space-before: 8
+ln-space-before: 8
+image-space-before: 10
+slide-background: |
+  pdf.set_fill_color(51, 92, 197)
+  pdf.rect(0, 0, pdf.w, pdf.h, "F")
+  pdf.set_fill_color(71, 60, 139)
+  pdf.rect(20, 15, pdf.w-15, 20, "F")
+  pdf.rect(20, pdf.h - 12, 100, 12, "F")
+  pdf.set_fill_color(200, 200, 200)
