@@ -2,35 +2,43 @@ fonts:
   - [ PT Sans, "B", PTS75F.ttf ]
   - [ PT Sans, "", PTS55F.ttf ] 
   - [ DejaVuSans, "", DejaVuSans.ttf]
-title-box: [[23, 80, 250, 20], C, [ PT Sans, B, 40 ], [50, 50, 50]]
-author-box: [[23, 100, 250, 15], C, [ PT Sans, B, 25 ], [100, 100, 100]] 
-email-box: [[23, 115, 250, 15], C, [ PT Sans, B, 25 ], [100, 100, 100]] 
+title-box:
+  - [23, 80, 250, 20]
+  - C
+  - [ PT Sans, B, 40 ]
+  - [50, 50, 50]
+author-box:
+  - [23, 100, 250, 15]
+  - C
+  - [ PT Sans, B, 25 ]
+  - [100, 100, 100]
+email-box:
+  - [23, 115, 250, 15]
+  - C
+  - [ PT Sans, B, 25 ]
+  - [100, 100, 100]
 lmargin-slide: 30
 tmargin-slide: 45
-body-font: PT Sans
-body-color: [0, 0, 0]
-slide-title-font: PT Sans
+slide-title-font: [ PT Sans, B, 40 ]
 slide-title-color: [100, 100, 100]
-slide-title-style: B
-slide-title-size: 40
-bullet-font: DejaVuSans
+bullet-font: [ DejaVuSans, "", 20 ]
 bullet-color: [180, 180, 180]
-bullet-size: 20
-para-size: 20
-l0-size: 20
-l1-size: 18
-l2-size: 16
-ln-size: 16
+l0-font: [ PT Sans, "", 20 ]
+l1-font: [ PT Sans, "", 18 ]
+l2-font: [ PT Sans, "", 16 ]
+ln-size: [ PT Sans, "", 16 ]
+l0-color: [0, 0, 0]
+l1-color: [0, 0, 0]
+l2-color: [0, 0, 0]
+ln-color: [0, 0, 0]
 l0-bullet: "\u2022"
 l1-bullet: "\u2043"
 l2-bullet: "\u2022"
 ln-bullet: "\u2043"
-para-height: 10
 l0-height: 10
 l1-height: 9
 l2-height: 8
 ln-height: 8
-para-space-before: 15
 l0-space-before: 15
 l1-space-before: 11
 l2-space-before: 8

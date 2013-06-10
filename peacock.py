@@ -88,17 +88,16 @@ class Element(object):
 
 class Para(Element):
     def __init__(self, pdf):
-        Element.__init__(self, pdf, pdf.theme["para-height"])
-        self.pdf.set_text_color(*self.pdf.theme["body-color"])
-        self.pdf.set_font(self.pdf.theme["body-font"], '',
-                          self.pdf.theme["para-size"])
+        Element.__init__(self, pdf, pdf.theme["l0-height"])
+        self.pdf.set_text_color(*self.pdf.theme["l0-color"])
+        self.pdf.set_font(*self.pdf.theme["l0-font"])
 
         if not self.pdf.check_page_start():
-            self.pdf.ln(self.pdf.theme["para-space-before"])
+            self.pdf.ln(self.pdf.theme["l0-space-before"])
 
     def style_changed(self, style):
         self.pdf.set_font(self.pdf.theme["body-font"], style,
-                          self.pdf.theme["para-size"])
+                          self.pdf.theme["l0-size"])
 
     def end(self):
         self.pdf.ln(0.01)
@@ -169,11 +168,14 @@ class List(Element):
     def __get_height(self):
         return self.__get_theme_param("l%s-height")
 
-    def __get_font_size(self):
-        return self.__get_theme_param("l%s-size")
+    def __get_font(self):
+        return self.__get_theme_param("l%s-font")
 
     def __get_space_before(self):
         return self.__get_theme_param("l%s-space-before")
+
+    def __get_color(self):
+        return self.__get_theme_param("l%s-color")
 
     def __get_bullet(self):
         if self.bullet == "1":
@@ -182,8 +184,7 @@ class List(Element):
             return "%d.  " % self.nitem
         elif self.bullet == "*":
             bullet = self.__get_theme_param("l%s-bullet")
-            self.pdf.set_font(self.pdf.theme["bullet-font"], '',
-                              self.pdf.theme["bullet-size"])
+            self.pdf.set_font(*self.pdf.theme["bullet-font"])
             return "%s  " % bullet
         else:
             raise ValueError("invalid bullet type")
@@ -205,9 +206,8 @@ class List(Element):
         self.pdf.cell(blt_width, self.__get_height(), bullet, 0, 0, '')
 
         # Setup for Text
-        font_size = self.__get_font_size()
-        self.pdf.set_font(self.pdf.theme["body-font"], '', font_size)
-        self.pdf.set_text_color(*self.pdf.theme["body-color"])
+        self.pdf.set_font(*self.__get_font())
+        self.pdf.set_text_color(*self.__get_color())
 
         # Save left margin
         self.bullet_margin = self.pdf.l_margin
@@ -242,9 +242,7 @@ class PDF(FPDF):
 
         if self.slide_title:
             self.set_text_color(*self.theme["slide-title-color"])
-            self.set_font(self.theme["slide-title-font"],
-                          self.theme["slide-title-style"],
-                          self.theme["slide-title-size"])
+            self.set_font(*self.theme["slide-title-font"])
         
             self.text(30, 30, self.slide_title)
             
