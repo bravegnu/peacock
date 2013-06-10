@@ -2,14 +2,17 @@ fonts:
   - [ PT Sans, "B", PTS75F.ttf ]
   - [ PT Sans, "", PTS55F.ttf ] 
   - [ DejaVuSans, "", DejaVuSans.ttf]
+title-box: [[23, 80, 250, 20], C, [ PT Sans, B, 40 ], [50, 50, 50]]
+author-box: [[23, 100, 250, 15], C, [ PT Sans, B, 25 ], [100, 100, 100]] 
+email-box: [[23, 115, 250, 15], C, [ PT Sans, B, 25 ], [100, 100, 100]] 
 lmargin-slide: 30
 tmargin-slide: 45
 body-font: PT Sans
 body-color: [0, 0, 0]
-title-font: PT Sans
-title-color: [100, 100, 100]
-title-style: B
-title-size: 40
+slide-title-font: PT Sans
+slide-title-color: [100, 100, 100]
+slide-title-style: B
+slide-title-size: 40
 bullet-font: DejaVuSans
 bullet-color: [180, 180, 180]
 bullet-size: 20

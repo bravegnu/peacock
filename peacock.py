@@ -231,6 +231,7 @@ class PDF(FPDF):
                          self.theme["tmargin-slide"])
         self.img = None
         self.page_start_flag = True
+        self.slide_title = None
 
     def theme_file(self, filename):
         return os.path.join(self.theme_dir, filename)
@@ -238,13 +239,15 @@ class PDF(FPDF):
     def header(self):
         draw_slide_background = self.theme.get("slide-background", "")
         exec(draw_slide_background, { "pdf": self })
+
+        if self.slide_title:
+            self.set_text_color(*self.theme["slide-title-color"])
+            self.set_font(self.theme["slide-title-font"],
+                          self.theme["slide-title-style"],
+                          self.theme["slide-title-size"])
         
-        self.set_text_color(*self.theme["title-color"])
-        self.set_font(self.theme["title-font"],
-                      self.theme["title-style"],
-                      self.theme["title-size"])
-        
-        self.text(30, 30, self.slide_title)
+            self.text(30, 30, self.slide_title)
+            
         self.page_start_flag = True
 
         if self.img:
@@ -338,11 +341,31 @@ class TwoColumnLayout(object):
     def end(self):
         pass
 
-class GenSlideDeck(object):
-    def __init__(self, slides, pdf, rpath):
+class Renderer(object):
+    def __init__(self, pdf, rpath):
         self.pdf = pdf
-        self.slides = slides
+        self.slides = None
         self.rpath = rpath
+
+    def __box_text(self, box, text):
+        (box_x, box_y, box_w, box_h), box_align, box_font, (box_color) = box
+
+        self.pdf.set_xy(box_x, box_y)
+        self.pdf.set_font(*box_font)
+        self.pdf.set_text_color(*box_color)
+        self.pdf.cell(box_w, box_h, txt=text, align=box_align)
+
+    def render_title(self, meta):
+        self.pdf.add_page()
+        self.__box_text(self.pdf.theme["title-box"], meta["title"])
+        self.__box_text(self.pdf.theme["author-box"], meta["author"])
+        self.__box_text(self.pdf.theme["email-box"], meta["email"])
+
+    def render_section(self):
+        pass
+
+    def render_slideset(self, slideset):
+        self.slides = slideset
         self.content = []
         self.element = None
         self.list = None
@@ -465,11 +488,14 @@ def peacock(in_fname, theme_dir, out_fname):
     pdf.set_keywords(keywords)
     pdf.set_creator("peacock")
         
-    GenSlideDeck(slideset, pdf, os.path.dirname(in_fname))
+    renderer = Renderer(pdf, os.path.dirname(in_fname))
+    renderer.render_title(meta)
+    renderer.render_slideset(slideset)
+    
     pdf.output(out_fname, 'F')
 
 if __name__ == "__main__":
     if len(sys.argv) != 4:
-        usage("error: insufficient arguments")
+        usage("error: insufficient arguments\n")
 
     peacock(sys.argv[1], sys.argv[2], sys.argv[3])
