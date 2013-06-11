@@ -456,44 +456,122 @@ class Renderer(object):
         for title, body in self.slides.iteritems():
             self.__gen_one_slide(title, body)
 
+def error(msg):
+    sys.stderr.write("peacock: ")
+    sys.stderr.write(msg)
+    sys.stderr.write("\n")
+    exit(1)
+
+class FormatError(Exception):
+    pass
+
+class ThemeError(Exception):
+    pass
+
+class Peacock(object):
+    def __init__(self):
+        self.infname = None
+        self.outfname = None
+        self.theme_dir = None
+        self.theme = None
+        self.pdf = None
+        self.meta = None
+        self.slideset = None
+
+    def main(self, infname, outfname, theme_dir):
+        self.infname = infname
+        self.outfname = outfname
+        self.theme_dir = theme_dir
+
+        self.init_theme()
+        self.pdf = PDF(self.theme, self.theme_dir)
+        self.pdf.alias_nb_pages()
+        self.init_theme_fonts()
+        self.init_presentation()
+        self.init_pdf_metainfo()
+        self.render()
+
+    def render(self):
+        renderer = Renderer(self.pdf, os.path.dirname(self.infname))
+        renderer.render_title(self.meta)
+        renderer.render_slideset(self.slideset)
+        self.pdf.output(self.outfname, 'F')
+
+    def init_presentation(self):
+        try:
+            with open(self.infname) as fp:
+                pt = yaml.load_all(fp, Loader=OrderedDictYAMLLoader)
+                self.meta = pt.next()
+                self.slideset = pt.next()
+        except IOError as e:
+            raise FormatError("error opening file '%s': %s" % (self.infname, e))
+        except yaml.MarkedYAMLError as e:
+            raise FormatError("error parsing '%s': %s" % (self.infname, e))
+
+    def init_pdf_metainfo(self):
+        self.meta = dict(self.meta)
+        
+        if "title" not in self.meta or not isinstance(self.meta["title"], str):
+            raise FormatError("'title' not present or is incorrect type")
+
+        if "author" not in self.meta or not isinstance(self.meta["author"], str):
+            raise FormatError("'author' not present or is incorrect type")
+
+        if "keywords" not in self.meta or not isinstance(self.meta["keywords"], list):
+            raise FormatError("'keywords' not present or is incorrect type")
+
+        for keyword in self.meta["keywords"]:
+            if not isinstance(keyword, str):
+                raise FormatError("'keywords' should contain only strings")
+
+        self.pdf.set_title(self.meta["title"])
+        self.pdf.set_author(self.meta["author"])
+        keywords = ", ".join(self.meta.get("keywords", []))
+        self.pdf.set_keywords(keywords)
+        self.pdf.set_creator("peacock")
+
+    def init_theme(self):
+        try:
+            info_fname = os.path.join(self.theme_dir, "info.yaml")
+            with open(info_fname) as fp:
+                self.theme = yaml.load(fp)
+        except IOError as e:
+            raise ThemeError("error opening file: %s" % e)
+        except yaml.MarkedYAMLError as e:
+            raise FromatError("error parsing '%s': %s" % (info_fname, e))
+
+    def init_theme_fonts(self):
+        fpdf.set_global("FPDF_FONT_DIR", self.theme_dir)
+
+        for finfo in self.theme.get("fonts", []):
+            try:
+                name, style, fname = finfo
+            except ValueError:
+                raise ThemeError("invalid 'fonts' in theme, fmt: [ name, style, fname ]")
+
+            if style not in [ "B", "I", "BI", "IB", "" ]:
+                raise ThemeError("invalid style in 'fonts' - '%s'" % style)
+
+            fname = os.path.join(self.theme_dir, fname)
+            if not os.path.exists(fname):
+                raise ThemeError("font file '%s' not found" % fname)
+
+            self.pdf.add_font(name, style, fname, uni=True)
+
 def usage(msg=None):
     sys.stderr.write(msg)
     print "Usage: peacock <input-file> <theme-dir> <output-file>"
     if msg != None: exit(1)
 
-def peacock(in_fname, theme_dir, out_fname):
-    fpdf.set_global("FPDF_FONT_DIR", theme_dir)
-    fp = open(os.path.join(theme_dir, "info.yaml"))
-    theme = yaml.load(fp)
-
-    pdf = PDF(theme, theme_dir)
-    pdf.alias_nb_pages()
-
-    for font in theme.get("fonts", []):
-        name = font[0]
-        style = font[1]
-        font_file = os.path.join(theme_dir, font[2])
-        pdf.add_font(name, style, font_file, uni=True)
-    
-    fp = open(in_fname)
-    pt = yaml.load_all(fp, Loader=OrderedDictYAMLLoader)
-    meta = pt.next()
-    slideset = pt.next()
-
-    pdf.set_title(meta["title"])
-    pdf.set_author(meta["author"])
-    keywords = ", ".join(meta.get("keywords", []))
-    pdf.set_keywords(keywords)
-    pdf.set_creator("peacock")
-        
-    renderer = Renderer(pdf, os.path.dirname(in_fname))
-    renderer.render_title(meta)
-    renderer.render_slideset(slideset)
-    
-    pdf.output(out_fname, 'F')
-
 if __name__ == "__main__":
     if len(sys.argv) != 4:
         usage("error: insufficient arguments\n")
 
-    peacock(sys.argv[1], sys.argv[2], sys.argv[3])
+    try:
+        peacock = Peacock()
+        peacock.main(sys.argv[1], sys.argv[2], sys.argv[3])
+    except FormatError as e:
+        error(str(e))
+    except ThemeError as e:
+        error(str(e))
+

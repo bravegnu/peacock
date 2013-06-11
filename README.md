@@ -16,7 +16,7 @@ TBD
 
 The general syntax for invoking peacock
 
-    peacock.py <input-file> <theme-dir> <output-file>
+    peacock.py <input-file> <output-file> <theme-dir>
 
 ## Input File Format
 
