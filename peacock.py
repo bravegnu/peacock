@@ -70,32 +70,9 @@ class FormatError(Exception):
 class ThemeError(Exception):
     pass
 
-class Element(object):
-    def __init__(self, pdf, h):
-        self.pdf = pdf
-        self.h = h
-        self.style = set()
-
-    def __notify_style_changed(self):
-        self.style_changed("".join(self.style))
-
-    def start_strong(self):
-        self.style.add("B")
-        self.__notify_style_changed()
-
-    def end_strong(self):
-        self.style.remove("B")
-        self.__notify_style_changed()
-
-    def write(self, text):
-        self.pdf.write(self.h, text)
-
-    def end(self):
-        pass
-
-class Para(Element):
+class Para(object):
     def __init__(self, pdf):
-        Element.__init__(self, pdf, pdf.theme["l0-height"])
+        self.pdf = pdf
         self.pdf.set_text_color(*self.pdf.theme["l0-color"])
         self.pdf.set_font(*self.pdf.theme["l0-font"])
 
@@ -109,9 +86,9 @@ class Para(Element):
     def end(self):
         self.pdf.ln(0.01)
 
-class BaseImage(Element):
+class BaseImage(object):
     def __init__(self, pdf, src, width, height):
-        Element.__init__(self, pdf, 0)
+        self.pdf = pdf
         self.src = src
         self.width = width / 72.0 * 25.4
         self.height = height / 72.0 * 25.4
@@ -134,9 +111,9 @@ class CenterImage(BaseImage):
         
         self.pdf.set_y(self.pdf.y + self.height)
 
-class Code(Element):
+class Code(object):
     def __init__(self, pdf, code, lexer):
-        Element.__init__(self, pdf, pdf.theme["code-height"])
+        self.pdf = pdf
         fname, fstyle, fsize = self.pdf.theme["code-font"]
 
         self.pdf.set_font(fname, fstyle, fsize)
@@ -159,8 +136,9 @@ class Code(Element):
                 self.pdf.set_font(fname, "I", fsize)
             else:
                 self.pdf.set_font(fname, "", fsize)
-            
-            self.pdf.write(self.h, text)
+
+            height = pdf.theme["code-height"]
+            self.pdf.write(height, text)
 
 class FloatImage(BaseImage):
     def __init__(self, pdf, src, width, height):
@@ -176,10 +154,7 @@ class FloatImage(BaseImage):
         self.pdf.image(self.src, img_margin, self.pdf.t_margin,
                        self.width, self.height)
 
-    def write(self, text):
-        pass
-
-class List(Element):
+class List(object):
     def __init__(self, pdf, bullet, parent=None):
         self.pdf = pdf
         self.bullet = bullet
@@ -191,8 +166,6 @@ class List(Element):
             self.level = 0
         else:
             self.level = self.parent.level + 1
-
-        Element.__init__(self, pdf, self.__get_height())
 
     def __get_theme_param(self, param):
         try:
@@ -256,6 +229,10 @@ class List(Element):
 
     def end_list(self):
         return self.parent
+
+    def write(self, text):
+        height = self.__get_height()
+        self.pdf.write(height, text)
 
 class PDF(FPDF):
     def __init__(self, theme, theme_dir):
@@ -399,8 +376,6 @@ class Renderer(object):
 
     def render_slideset(self, slideset):
         self.slides = slideset
-        self.content = []
-        self.element = None
         self.list = None
         self.layout = None
         self.__gen_slides()
