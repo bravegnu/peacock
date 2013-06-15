@@ -63,6 +63,9 @@ class OrderedDictYAMLLoader(yaml.Loader):
 class FormatError(Exception):
     pass
 
+class ThemeError(Exception):
+    pass
+
 class Element(object):
     def __init__(self, pdf, h):
         self.pdf = pdf
@@ -462,12 +465,6 @@ def error(msg):
     sys.stderr.write("\n")
     exit(1)
 
-class FormatError(Exception):
-    pass
-
-class ThemeError(Exception):
-    pass
-
 class Peacock(object):
     def __init__(self):
         self.infname = None
@@ -538,7 +535,7 @@ class Peacock(object):
         except IOError as e:
             raise ThemeError("error opening file: %s" % e)
         except yaml.MarkedYAMLError as e:
-            raise FromatError("error parsing '%s': %s" % (info_fname, e))
+            raise ThemeError("error parsing '%s': %s" % (info_fname, e))
 
     def init_theme_fonts(self):
         fpdf.set_global("FPDF_FONT_DIR", self.theme_dir)
