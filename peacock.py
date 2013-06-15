@@ -9,6 +9,10 @@ import yaml
 import yaml.constructor
 import itertools
 import os.path
+import pygments
+import pygments.util
+import pygments.lexers
+import pygments.styles
 
 try:
     # included in standard lib from Python 2.7
@@ -129,6 +133,34 @@ class CenterImage(BaseImage):
             self.height = self.width * info["h"] / info["w"]
         
         self.pdf.set_y(self.pdf.y + self.height)
+
+class Code(Element):
+    def __init__(self, pdf, code, lexer):
+        Element.__init__(self, pdf, pdf.theme["code-height"])
+        fname, fstyle, fsize = self.pdf.theme["code-font"]
+
+        self.pdf.set_font(fname, fstyle, fsize)
+        style = pygments.styles.get_style_by_name("emacs")
+        style = dict(style)
+        for token, text in pygments.lex(code["code"], lexer):
+            token_style = style[token]
+
+            if token_style["color"]:
+                r, g, b = map(ord, token_style["color"].decode("hex"))
+            else:
+                r, g, b = (0, 0, 0)
+            self.pdf.set_text_color(r, g, b)
+
+            if token_style["bold"] and token_style["italic"]:
+                self.pdf.set_font(fname, "BI", fsize)
+            elif token_style["bold"]:
+                self.pdf.set_font(fname, "B", fsize)
+            elif token_style["italic"]:
+                self.pdf.set_font(fname, "I", fsize)
+            else:
+                self.pdf.set_font(fname, "", fsize)
+            
+            self.pdf.write(self.h, text)
 
 class FloatImage(BaseImage):
     def __init__(self, pdf, src, width, height):
@@ -435,6 +467,22 @@ class Renderer(object):
     def __gen_table(self, table):
         pass
 
+    def __gen_code(self, code):
+        if not "code" in code:
+            raise FormatError("Missing 'code' in 'code'")
+
+        lang = code.get("lang", "text")
+        try:
+            lexer = pygments.lexers.get_lexer_by_name(lang)
+        except pygments.util.ClassNotFound:
+            raise FormatError("Unknown 'lang' '%s'" % lang)
+
+        pos = code.get("pos", None)
+
+        self.layout.start(pos)
+        Code(self.pdf, code, lexer)
+        self.layout.end()
+
     def __gen_one_slide(self, title, body):
         self.__new_slide(title)
         
@@ -447,6 +495,8 @@ class Renderer(object):
                     self.__gen_layout(item)
                 elif dtype == "table":
                     self.__gen_table(item)
+                elif dtype == "code":
+                    self.__gen_code(item)
                 elif dtype == None:
                     raise FormatError("Missing data type")
                 else:

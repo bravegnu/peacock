@@ -125,3 +125,52 @@ Ramdisk:
   - Thus if any server dies, and these systems were collaborating via
     it, any of the client repositories can be copied back up to the
     server to restore it.
+
+Code Test:
+
+  - type: code
+    lang: python
+    code: |
+        if len(sys.argv) != 4:
+            usage("error: insufficient arguments\n")
+
+        try:
+            peacock = Peacock()
+            peacock.main(sys.argv[1], sys.argv[2], sys.argv[3])
+        except FormatError as e:
+            error(str(e))
+        except ThemeError as e:
+            error(str(e))
+        
+Without Lang:
+
+  - { type: "layout", mode: two-col, width: auto }
+  - type: code
+    code: |
+        # FIXME: Handle lang not present
+        lang = code["lang"]
+        try:
+            lexer = pygments.lexers.get_lexer_by_name(lang)
+        except pygments.util.ClassNotFound:
+            raise FormatError("Unknown 'lang' '%s'" % lang)
+
+  - When no lang is specified it is rendered without highlighting.
+
+Python Console:
+
+  - type: code
+    lang: pycon
+    code: |
+        >>> x = int(raw_input("Please enter an integer: "))
+        Please enter an integer: 42
+        >>> if x < 0:
+        ...      x = 0
+        ...      print 'Negative changed to zero'
+        ... elif x == 0:
+        ...      print 'Zero'
+        ... elif x == 1:
+        ...      print 'Single'
+        ... else:
+        ...      print 'More'
+        ...
+        More

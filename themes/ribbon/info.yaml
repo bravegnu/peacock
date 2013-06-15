@@ -1,7 +1,11 @@
 fonts: 
   - [ PT Sans, "B", PTS75F.ttf ]
   - [ PT Sans, "", PTS55F.ttf ] 
-  - [ DejaVuSans, "", DejaVuSans.ttf]
+  - [ DejaVuSans, "", DejaVuSans.ttf ]
+  - [ DejaVuSansMono, "", DejaVuSansMono.ttf ]
+  - [ DejaVuSansMono, "B", DejaVuSansMono-Bold.ttf ]
+  - [ DejaVuSansMono, "I", DejaVuSansMono-Oblique.ttf ]
+  - [ DejaVuSansMono, "BI", DejaVuSansMono-BoldOblique.ttf ]
 title-box:
   - [23, 80, 250, 20]
   - C
@@ -44,5 +48,7 @@ l1-space-before: 11
 l2-space-before: 8
 ln-space-before: 8
 image-space-before: 10
+code-font: [ DejaVuSansMono, "", 15 ]
+code-height: 9
 slide-background: |
   pdf.image(pdf.theme_file("ribbon.png"), 250, 0, 15)
