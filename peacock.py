@@ -76,9 +76,6 @@ class Para(object):
         self.pdf.set_text_color(*self.pdf.theme["l0-color"])
         self.pdf.set_font(*self.pdf.theme["l0-font"])
 
-        if not self.pdf.check_page_start():
-            self.pdf.ln(self.pdf.theme["l0-space-before"])
-
     def style_changed(self, style):
         self.pdf.set_font(self.pdf.theme["body-font"], style,
                           self.pdf.theme["l0-size"])
@@ -155,12 +152,13 @@ class FloatImage(BaseImage):
                        self.width, self.height)
 
 class List(object):
-    def __init__(self, pdf, bullet, parent=None):
+    def __init__(self, pdf, bullet, nitems, parent=None):
         self.pdf = pdf
         self.bullet = bullet
         self.parent = parent
         self.bullet_margin = None
-        self.nitem = 1
+        self.nitems = nitems
+        self.icount = 1
 
         if self.parent == None:
             self.level = 0
@@ -189,7 +187,7 @@ class List(object):
         if self.bullet == "1":
             font_size = self.__get_font_size()
             self.pdf.set_font(self.pdf.theme["body-font"], '', font_size)            
-            return "%d.  " % self.nitem
+            return "%d.  " % self.icount
         elif self.bullet == "*":
             bullet = self.__get_theme_param("l%s-bullet")
             self.pdf.set_font(*self.pdf.theme["bullet-font"])
@@ -201,10 +199,15 @@ class List(object):
         self.pdf.set_font(self.pdf.theme["body-font"], style,
                           self.__get_font_size())
 
-    def start_item(self):
-        if not self.pdf.check_page_start():
+    def start_item(self, first):
+        if not first:
             self.pdf.ln(self.__get_space_before())
 
+        if self.nitems == 1:
+            self.pdf.set_font(*self.__get_font())
+            self.pdf.set_text_color(*self.__get_color())
+            return
+            
         bullet = self.__get_bullet()
         # Get bullet width including margins
         blt_width = self.pdf.get_string_width(bullet)
@@ -221,7 +224,7 @@ class List(object):
         self.bullet_margin = self.pdf.l_margin
         self.pdf.set_left_margin(self.bullet_margin + blt_width)
 
-        self.nitem += 1
+        self.icount += 1
 
     def end_item(self):
         self.pdf.set_left_margin(self.bullet_margin)
@@ -242,7 +245,6 @@ class PDF(FPDF):
         self.set_margins(self.theme["lmargin-slide"],
                          self.theme["tmargin-slide"])
         self.img = None
-        self.page_start_flag = True
         self.slide_title = None
 
     def theme_file(self, filename):
@@ -258,19 +260,8 @@ class PDF(FPDF):
         
             self.text(30, 30, self.slide_title)
             
-        self.page_start_flag = True
-
         if self.img:
             self.img.draw()
-
-    def check_page_start(self):
-        if not self.page_start_flag:
-            return False
-
-        ret = self.get_y() == self.t_margin
-        if ret == True:
-            self.page_start_flag = False
-            return True
 
     def footer(self):
         self.set_y(-15)
@@ -390,11 +381,11 @@ class Renderer(object):
         self.list = None
         self.layout = SimpleLayout(self.pdf)
 
-    def __gen_item(self, item, next_item):
+    def __gen_item(self, i, item, next_item):
         if isinstance(item, list):
             self.__gen_list(item)
         else:
-            self.list.start_item()
+            self.list.start_item(i == 0)
             self.list.write(item)
 
         if not isinstance(next_item, list):
@@ -402,10 +393,10 @@ class Renderer(object):
 
     def __gen_list(self, items):
         self.layout.start(None)
-        self.list = List(self.pdf, "*", self.list)
+        self.list = List(self.pdf, "*", len(items), self.list)
 
-        for item, next_item in pairwise(items):
-            self.__gen_item(item, next_item)
+        for i, (item, next_item) in enumerate(pairwise(items)):
+            self.__gen_item(i, item, next_item)
 
         self.list = self.list.end_list()
         self.layout.end()

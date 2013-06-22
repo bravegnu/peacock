@@ -154,7 +154,12 @@ Without Lang:
         except pygments.util.ClassNotFound:
             raise FormatError("Unknown 'lang' '%s'" % lang)
 
-  - When no lang is specified it is rendered without highlighting.
+  - When no lang is specified it is rendered without
+    highlighting. Explicit lang is to be specified if highlighting is
+    required.
+
+    
+    Consult the documentation for the possible lang values.
 
 Python Console:
 
