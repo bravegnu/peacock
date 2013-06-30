@@ -6,78 +6,101 @@ keywords: [ git, vcs, version control, dvcs ]
 ---
 Distributed VCS:
 
-  - In a DVCS (such as Git, Mercurial, Bazaar or Darcs), clients don't
-    just check out the latest snapshot of the files they fully mirror
-    the repository. Thus if any server dies, and thxese systems were
-    collaborating via it, any of the client repositories can be copied
-    back up to the server to restore it. Every checkout is really a
-    full backup of all the data.
+  - type: text
+    text: |
 
-  - Yet another para.
+      * In a DVCS (such as Git, Mercurial, Bazaar or Darcs), clients
+        don't just check out the latest snapshot of the files they
+        fully mirror the repository. Thus if any server dies, and
+        thxese systems were collaborating via it, any of the client
+        repositories can be copied back up to the server to restore
+        it. Every checkout is really a full backup of all the data.
+
+      * Yet another para.
+
+Style Test:
+
+  - type: text
+    text: |
+      
+      * In a *DVCS* (such as Git, Mercurial, Bazaar or Darcs), clients
+        don't just **check** out the latest snapshot of the files they
+        fully mirror the ***repository***. Thus if any server dies,
+        and *these systems **were** collaborating* via it, any of the
+        client repositories can be copied back up to the server to
+        restore it. Every checkout is really a full backup of all the
+        data.
+
+      * Yet another para.
 
 Multi Page Test:
 
-  - In a DVCS (such as Git, Mercurial, Bazaar or Darcs), clients don't
-    just check out the latest snapshot of the files they fully mirror
-    the repository.
+  - type: text
+    text: |
 
-  - Thus if any server dies, and these systems were collaborating via
-    it, any of the client repositories can be copied back up to the
-    server to restore it.
+      * In a DVCS (such as Git, Mercurial, Bazaar or Darcs), clients
+        don't just check out the latest snapshot of the files they
+        fully mirror the repository. Thus if any server dies, and
+        thxese systems were collaborating via it, any of the client
+        repositories can be copied back up to the server to restore
+        it. Every checkout is really a full backup of all the data.
 
-  - Every checkout is really a full backup of all the data.
+      * Yet another para.
 
-  - In a DVCS (such as Git, Mercurial, Bazaar or Darcs), clients don't
-    just check out the latest snapshot of the files they fully mirror
-    the repository.
+      * In a DVCS (such as Git, Mercurial, Bazaar or Darcs), clients
+        don't just check out the latest snapshot of the files they
+        fully mirror the repository. Thus if any server dies, and
+        thxese systems were collaborating via it, any of the client
+        repositories can be copied back up to the server to restore
+        it. Every checkout is really a full backup of all the data.
 
-  - Thus if any server dies, and these systems were collaborating via
-    it, any of the client repositories can be copied back up to the
-    server to restore it.
+      * Yet another para.
 
-  - Every checkout is really a full backup of all the data.
+      * In a DVCS (such as Git, Mercurial, Bazaar or Darcs), clients
+        don't just check out the latest snapshot of the files they
+        fully mirror the repository. Thus if any server dies, and
+        thxese systems were collaborating via it, any of the client
+        repositories can be copied back up to the server to restore
+        it. Every checkout is really a full backup of all the data.
 
-  - In a DVCS (such as Git, Mercurial, Bazaar or Darcs), clients don't
-    just check out the latest snapshot of the files they fully mirror
-    the repository.
+      * Yet another para.
 
-  - Thus if any server dies, and these systems were collaborating via
-    it, any of the client repositories can be copied back up to the
-    server to restore it.
+      * In a DVCS (such as Git, Mercurial, Bazaar or Darcs), clients
+        don't just check out the latest snapshot of the files they
+        fully mirror the repository. Thus if any server dies, and
+        thxese systems were collaborating via it, any of the client
+        repositories can be copied back up to the server to restore
+        it. Every checkout is really a full backup of all the data.
 
-  - Every checkout is really a full backup of all the data.
-
-  - In a DVCS (such as Git, Mercurial, Bazaar or Darcs), clients don't
-    just check out the latest snapshot of the files they fully mirror
-    the repository.
-
-  - Thus if any server dies, and these systems were collaborating via
-    it, any of the client repositories can be copied back up to the
-    server to restore it.
-
-  - Every checkout is really a full backup of all the data.
+      * Yet another para.
 
 Version Control Systems:
 
-  - Git
-  - Hg
-  - Bazaar
-  - Darcs
+  - type: text
+    text: |
+      
+      * Git
+      * Hg
+      * Bazaar
+      * Darcs
 
 Nested Lists:
 
-  - Git is an *open source*, distributed version control system
-    designed for speed and efficiency
+  - type: text
+    text: |
 
-  - - Hg
-    - Darcs
-    - Mercurial
-    - Bazaar
+      * Git is an *open source*, distributed version control system
+        designed for speed and efficiency
 
-  - You can get a Git project using two main approaches. The first
-    takes an existing project or directory and imports it into
-    Git. The second clones an existing Git repository from another
-    server.
+          + Hg
+          + Darcs
+          + Mercurial
+          + Bazaar
+
+      * You can get a Git project using two main approaches. The first
+        takes an existing project or directory and imports it into
+        Git. The second clones an existing Git repository from another
+        server.
 
 Center Image:
 
@@ -89,12 +112,16 @@ Mainframes:
 
   - { type: image, src: mainframe.png, width: 288, pos: left }
   
-  - In a DVCS (such as Git, Mercurial, Bazaar or Darcs), clients don't just
-    check out the latest snapshot of the files they fully mirror the repository.
+  - type: text
+    text: | 
 
-  - Thus if any server dies, and these systems were collaborating via it, any
-    of the client repositories can be copied back up to the server to restore
-    it.
+      * In a DVCS (such as Git, Mercurial, Bazaar or Darcs), clients
+        don't just check out the latest snapshot of the files they
+        fully mirror the repository.
+
+      * Thus if any server dies, and these systems were collaborating
+        via it, any of the client repositories can be copied back up
+        to the server to restore it.
 
 Ramdisk:
 
@@ -102,29 +129,32 @@ Ramdisk:
 
   - { type: image, src: ramdisk.png, width: 144, pos: left }
 
-  - In a DVCS (such as Git, Mercurial, Bazaar or Darcs), clients don't
-    just check out the latest snapshot of the files they fully mirror
-    the repository.
+  - type: text
+    text: | 
 
-  - Thus if any server dies, and these systems were collaborating via
-    it, any of the client repositories can be copied back up to the
-    server to restore it.
+      * In a DVCS (such as Git, Mercurial, Bazaar or Darcs), clients
+        don't just check out the latest snapshot of the files they
+        fully mirror the repository.
 
-  - In a DVCS (such as Git, Mercurial, Bazaar or Darcs), clients don't
-    just check out the latest snapshot of the files they fully mirror
-    the repository.
+      * Thus if any server dies, and these systems were collaborating
+        via it, any of the client repositories can be copied back up
+        to the server to restore it.
 
-  - Thus if any server dies, and these systems were collaborating via
-    it, any of the client repositories can be copied back up to the
-    server to restore it.
-     
-  - Thus if any server dies, and these systems were collaborating via
-    it, any of the client repositories can be copied back up to the
-    server to restore it.
+      * In a DVCS (such as Git, Mercurial, Bazaar or Darcs), clients
+        don't just check out the latest snapshot of the files they
+        fully mirror the repository.
 
-  - Thus if any server dies, and these systems were collaborating via
-    it, any of the client repositories can be copied back up to the
-    server to restore it.
+      * Thus if any server dies, and these systems were collaborating
+        via it, any of the client repositories can be copied back up
+        to the server to restore it.
+
+      * In a DVCS (such as Git, Mercurial, Bazaar or Darcs), clients
+        don't just check out the latest snapshot of the files they
+        fully mirror the repository.
+
+      * Thus if any server dies, and these systems were collaborating
+        via it, any of the client repositories can be copied back up
+        to the server to restore it.
 
 Code Test:
 
@@ -154,12 +184,15 @@ Without Lang:
         except pygments.util.ClassNotFound:
             raise FormatError("Unknown 'lang' '%s'" % lang)
 
-  - When no lang is specified it is rendered without
-    highlighting. Explicit lang is to be specified if highlighting is
-    required.
+  - type: text
+    text: |
+
+      * When no lang is specified it is rendered without
+        highlighting. Explicit lang is to be specified if highlighting
+        is required.
 
     
-    Consult the documentation for the possible lang values.
+      * Consult the documentation for the possible lang values.
 
 Python Console:
 

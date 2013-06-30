@@ -1,6 +1,8 @@
 fonts: 
   - [ PT Sans, "B", PTS75F.ttf ]
   - [ PT Sans, "", PTS55F.ttf ] 
+  - [ PT Sans, "I", PTS56F.ttf ]
+  - [ PT Sans, "BI", PTS76F.ttf ]
   - [ DejaVuSans, "", DejaVuSans.ttf ]
   - [ DejaVuSansMono, "", DejaVuSansMono.ttf ]
   - [ DejaVuSansMono, "B", DejaVuSansMono-Bold.ttf ]

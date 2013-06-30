@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
 from fpdf import FPDF
+from HTMLParser import HTMLParser
+from markdown import markdown
 
 import fpdf
 import re
@@ -108,6 +110,80 @@ class CenterImage(BaseImage):
         
         self.pdf.set_y(self.pdf.y + self.height)
 
+
+class HTMLRenderer(HTMLParser):
+    def __init__(self, pdf):
+        HTMLParser.__init__(self)
+        self.pdf = pdf
+        self.curr_list = None
+        self.in_item = False
+
+    def handle_starttag(self, tag, attrs):
+        if tag == "ul":
+            if self.curr_list != None:
+                self.curr_list.write("\n")
+            self.curr_list = List(self.pdf, "*", self.curr_list)
+        elif tag == "li":
+            self.curr_list.start_item()
+            self.in_item = True
+        elif tag == "em":
+            self.curr_list.start_italic()
+        elif tag == "strong":
+            self.curr_list.start_bold()
+        elif tag == "code":
+            # FIXME: need to implement code
+            pass
+        elif tag == "p":
+            pass
+        else:
+            raise FormatError("unsupported markup '%s' in text" % tag)
+
+    def handle_endtag(self, tag):
+        if tag == "ul":
+            self.curr_list = self.curr_list.end_list()
+        elif tag == "li":
+            self.curr_list.end_item()
+            self.in_item = False
+        elif tag == "em":
+            self.curr_list.end_italic()
+        elif tag == "strong":
+            self.curr_list.end_bold()
+        elif tag == "code":
+            self.curr_list.end_mono()
+        elif tag == "p":
+            pass
+        else:
+            raise FormatError("unsupported markup '%s' in text" % tag)
+
+    def handle_data(self, data):
+        if not self.in_item:
+            return
+        
+        for i, ch in enumerate(data):
+            if not ch.isspace():
+                break
+
+        leading = i
+
+        for i, ch in enumerate(data[::-1]):
+            if not ch.isspace():
+                break
+
+        trailing = i
+
+        idata = data[leading:len(data)-trailing]
+        idata = " ".join(idata.split())
+
+        data = data[:leading] + idata + data[len(data)-trailing:]
+        self.curr_list.write(data)
+
+class Text(object):
+    def __init__(self, pdf, text):
+        html = markdown(unicode(text["text"]))
+        print html
+        renderer = HTMLRenderer(pdf)
+        renderer.feed(html)
+
 class Code(object):
     def __init__(self, pdf, code, lexer):
         self.pdf = pdf
@@ -152,18 +228,21 @@ class FloatImage(BaseImage):
                        self.width, self.height)
 
 class List(object):
-    def __init__(self, pdf, bullet, nitems, parent=None):
+    def __init__(self, pdf, bullet, parent=None):
         self.pdf = pdf
         self.bullet = bullet
         self.parent = parent
         self.bullet_margin = None
-        self.nitems = nitems
         self.icount = 1
+        self.first = True
+        self.style = []
 
         if self.parent == None:
             self.level = 0
         else:
             self.level = self.parent.level + 1
+
+        print self.level, self.pdf.l_margin
 
     def __get_theme_param(self, param):
         try:
@@ -199,15 +278,12 @@ class List(object):
         self.pdf.set_font(self.pdf.theme["body-font"], style,
                           self.__get_font_size())
 
-    def start_item(self, first):
-        if not first:
+    def start_item(self):
+        if not self.first:
             self.pdf.ln(self.__get_space_before())
 
-        if self.nitems == 1:
-            self.pdf.set_font(*self.__get_font())
-            self.pdf.set_text_color(*self.__get_color())
-            return
-            
+        self.first = False
+
         bullet = self.__get_bullet()
         # Get bullet width including margins
         blt_width = self.pdf.get_string_width(bullet)
@@ -233,7 +309,21 @@ class List(object):
     def end_list(self):
         return self.parent
 
+    def start_italic(self):
+        self.style.append("I")
+
+    def start_bold(self):
+        self.style.append("B")
+
+    def end_italic(self):
+        self.style.pop()
+
+    def end_bold(self):
+        self.style.pop()
+
     def write(self, text):
+        style = "".join(set(self.style))
+        self.pdf.set_font("", style)
         height = self.__get_height()
         self.pdf.write(height, text)
 
@@ -435,7 +525,7 @@ class Renderer(object):
 
     def __gen_code(self, code):
         if not "code" in code:
-            raise FormatError("Missing 'code' in 'code'")
+            raise FormatError("Missing 'code' attribute in element 'code'")
 
         lang = code.get("lang", "text")
         try:
@@ -447,6 +537,16 @@ class Renderer(object):
 
         self.layout.start(pos)
         Code(self.pdf, code, lexer)
+        self.layout.end()
+
+    def __gen_text(self, text):
+        if not "text" in text:
+            raise FormatError("Missing 'text' attribute in element 'text'")
+
+        pos = text.get("pos", None)
+
+        self.layout.start(pos)
+        Text(self.pdf, text)
         self.layout.end()
 
     def __gen_one_slide(self, title, body):
@@ -463,13 +563,14 @@ class Renderer(object):
                     self.__gen_table(item)
                 elif dtype == "code":
                     self.__gen_code(item)
+                elif dtype == "text":
+                    self.__gen_text(item)
                 elif dtype == None:
-                    raise FormatError("Missing data type")
+                    raise FormatError("Missing element type")
                 else:
-                    raise FormatError("Unknown data type: %s", dtype)
+                    raise FormatError("Unknown element type: %s", dtype)
             else:
-                self.__gen_list(body[i:])
-                break
+                raise FormatError("Expected map found %s" % type(item))
 
     def __gen_slides(self):
         for title, body in self.slides.iteritems():
