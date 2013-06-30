@@ -674,7 +674,7 @@ class Peacock(object):
 
 def usage(msg=None):
     sys.stderr.write(msg)
-    print "Usage: peacock <input-file> <theme-dir> <output-file>"
+    print "Usage: peacock <input-file> <output-file> <theme-dir>"
     if msg != None: exit(1)
 
 if __name__ == "__main__":
