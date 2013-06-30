@@ -8,6 +8,7 @@ represented in YAML.
   * pyfpdf - Simple PDF generation for Python
   * pyyaml - YAML implementation in Python
   * pygments - Syntax highlighter
+  * markdown - Markdown to HTML converter
 
 ## Installing
 
